@@ -1,4 +1,5 @@
-﻿using Abp.Application.Services;
+﻿using Abp;
+using Abp.Application.Services;
 using Abp.Domain.Repositories;
 using Abp.Runtime.Session;
 using AutoMapper;
@@ -6,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Text;
 using System.Threading.Tasks;
 using TalentMatrix.Authorization.Users;
@@ -14,20 +16,91 @@ using TalentMatrix.Org.Dto;
 
 namespace TalentMatrix.Org
 {
+    public class UserExtension
+    {
+        public string FullName { get; set; }
+        public long UserId { get; set; }
+        public string UserName { get; set; }
+        public string InnerCode { get; set; }
+    }
     public class OrgAppService: IApplicationService, IOrgAppService
     {
         private readonly IAbpSession _abpSession;
         public readonly IRepository<Organization> _reposity;
+        public readonly IRepository<OrgUser> _orgReposity;
+        public readonly IRepository<User, long> _userReposity;
         public readonly MyAppSession _myAppSession;
         public OrgAppService(IRepository<Organization> reposity,
-             MyAppSession myAppSession,
+            IRepository<OrgUser> orgReposity,
+             IRepository<User,long> userReposity,
+        MyAppSession myAppSession,
              IAbpSession abpSession)
         {
+            _orgReposity = orgReposity;
             _abpSession = abpSession;
             _reposity = reposity;
             _myAppSession = myAppSession;
+            _userReposity = userReposity;
         }
-        public List<Organization> GetOrgList()
+
+        public List<UserExtension> getAll()
+        { 
+
+                var query = from user in _userReposity.GetAll()
+                            join orguser in _orgReposity.GetAll()
+                            on user.Id equals orguser.UserId
+                            join org in _reposity.GetAll()
+                            on orguser.OrgId equals org.Id
+                            select new UserExtension
+                            {
+                                FullName = user.FullName,
+                                UserId = user.Id,
+                                UserName = user.UserName,
+                                InnerCode = org.InnerCode
+                            };
+            return query.ToList();
+        }
+
+        public List<UserExtension> getAlls()
+        {
+
+            var query = from user in _userReposity.GetAll()
+                        join orguser in _orgReposity.GetAll()
+                        on user.Id equals orguser.UserId
+                        join org in _reposity.GetAll()
+                        on orguser.OrgId equals org.Id
+                        select new UserExtension
+                        {
+                            FullName = user.FullName,
+                            UserId = user.Id,
+                            UserName = user.UserName,
+                            InnerCode = org.InnerCode
+                        };
+            
+
+            //var query = _userReposity.GetAll()
+            //   .Join(
+            //           _orgReposity.GetAll(), _reposity.GetAll(),
+            //   top => top.Id,
+            //   art => art.UserId,
+            //   (top, art) => new UserExtension
+            //   {
+            //       Name = top.Name,
+            //       Telephone = art.PhoneNumber
+            //   })
+            // .Join(
+            //           _orgReposity.GetAll(),
+            //   top => top.Id,
+            //   art => art.PersonId,
+            //   (top, art) => new UserExtension
+            //   {
+            //       Name = top.Name,
+            //       Telephone = art.PhoneNumber
+            //   });
+            return query.ToList();
+        }
+
+    public List<Organization> GetOrgList()
         {
             List<Organization> res = _reposity.GetAllList();
            string email =  _myAppSession.GetUserEmail();

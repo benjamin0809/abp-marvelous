@@ -11,7 +11,7 @@ namespace TalentMatrix.EntityFrameworkCore
     {
         /* Define a DbSet for each entity of the application */
         public DbSet<Organization> Organization { get; set; }
-
+        public DbSet<OrgUser> OrgUser { get; set; }
 
 
         public TalentMatrixDbContext(DbContextOptions<TalentMatrixDbContext> options)
