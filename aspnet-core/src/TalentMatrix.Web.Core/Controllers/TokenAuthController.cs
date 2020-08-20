@@ -53,12 +53,19 @@ namespace TalentMatrix.Controllers
         [HttpPost]
         public async Task<AuthenticateResultModel> Authenticate([FromBody] AuthenticateModel model)
         {
-            var loginResult = await GetLoginResultAsync(
+            //var loginResult = await GetLoginResultAsync(
+            //    model.UserNameOrEmailAddress,
+            //    model.Password,
+            //    GetTenancyNameOrNull()
+            //);
+
+            //自定义登录获取结果
+            var loginResult = await GetCustomLoginResultAsync(
                 model.UserNameOrEmailAddress,
-                model.Password,
-                GetTenancyNameOrNull()
+                model.Password
             );
-            var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity, loginResult.Role));
+
+            var accessToken = CreateAccessToken(CreateJwtClaims(loginResult.Identity, null));
 
             return new AuthenticateResultModel
             {
@@ -184,6 +191,7 @@ namespace TalentMatrix.Controllers
         {
             var loginResult = await _logInManager.LoginAsync(usernameOrEmailAddress, password, null);
 
+
             TalentLoginResult result = (TalentLoginResult)loginResult;
             switch (result.Result)
             {
@@ -194,6 +202,24 @@ namespace TalentMatrix.Controllers
             }
         }
 
+        /// <summary>
+        /// 自定义登录
+        /// </summary>
+        /// <param name="userName">账号、身份证、手机号</param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        private async Task<AbpLoginResult<Tenant, User>> GetCustomLoginResultAsync(string userName, string password)
+        {
+            var loginResult = await _logInManager.LoginCustomAsync(userName, password);
+
+            switch (loginResult.Result)
+            {
+                case AbpLoginResultType.Success:
+                    return loginResult;
+                default:
+                    throw _abpLoginResultTypeHelper.CreateExceptionForFailedLoginAttempt(loginResult.Result, userName, null);
+            }
+        }
 
         private string CreateAccessToken(IEnumerable<Claim> claims, TimeSpan? expiration = null)
         {
@@ -218,12 +244,19 @@ namespace TalentMatrix.Controllers
             // Specifically add the jti (random nonce), iat (issued timestamp), and sub (subject/user) claims.
             claims.AddRange(new[]
             {
-                new Claim("Role", Role),
+                
                 new Claim(JwtRegisteredClaimNames.Sub, nameIdClaim.Value),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new Claim(JwtRegisteredClaimNames.Iat, DateTimeOffset.Now.ToUnixTimeSeconds().ToString(), ClaimValueTypes.Integer64)
             });
 
+            if (Role != null)
+            {
+                claims.AddRange(new[]
+                {
+                        new Claim("Role", Role)
+                });
+            }
             return claims;
         }
 

@@ -13,6 +13,8 @@ using TalentMatrix.Authentication.JwtBearer;
 using TalentMatrix.Configuration;
 using TalentMatrix.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using TalentMatrix.Authentication.External;
+using TalentMatrix.Authentication.External.Workflow;
 
 namespace TalentMatrix
 {
@@ -60,6 +62,17 @@ namespace TalentMatrix
             tokenAuthConfig.Audience = _appConfiguration["Authentication:JwtBearer:Audience"];
             tokenAuthConfig.SigningCredentials = new SigningCredentials(tokenAuthConfig.SecurityKey, SecurityAlgorithms.HmacSha256);
             tokenAuthConfig.Expiration = TimeSpan.FromDays(1);
+
+            IocManager.Register<IExternalAuthConfiguration, ExternalAuthConfiguration>();
+            var externalAuthConfiguration = IocManager.Resolve<IExternalAuthConfiguration>();
+            externalAuthConfiguration.Providers.Add(
+                 new ExternalLoginProviderInfo(
+                    "Workflow",
+                    _appConfiguration["Authentication:Workflow:AppId"],
+                    _appConfiguration["Authentication:Facebook:AppSecret"],
+                    typeof(WorkflowAuthProviderApi)
+                )
+            );
         }
 
         public override void Initialize()
