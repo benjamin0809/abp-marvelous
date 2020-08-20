@@ -6,9 +6,9 @@ namespace TalentMatrix.Authentication.External
     {
         ExternalLoginProviderInfo ProviderInfo { get; }
 
-        Task<bool> IsValidUser(string userId, string accessCode);
+        Task<bool> IsValidUser(string userId, string staffNumber, string password);
 
-        Task<ExternalAuthUserInfo> GetUserInfo(string accessCode);
+        Task<ExternalAuthUserInfo> GetUserInfo(string staffNumber, string password);
 
         void Initialize(ExternalLoginProviderInfo providerInfo);
     }

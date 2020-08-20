@@ -16,21 +16,23 @@ namespace TalentMatrix.Authentication.External
             _externalAuthConfiguration = externalAuthConfiguration;
         }
 
-        public Task<bool> IsValidUser(string provider, string providerKey, string providerAccessCode)
+        public Task<bool> IsValidUser(string provider, string providerKey, string staffNumber, string password)
         {
             using (var providerApi = CreateProviderApi(provider))
             {
-                return providerApi.Object.IsValidUser(providerKey, providerAccessCode);
+                return providerApi.Object.IsValidUser(providerKey, staffNumber, password);
             }
         }
 
-        public Task<ExternalAuthUserInfo> GetUserInfo(string provider, string accessCode)
+
+        public Task<ExternalAuthUserInfo> GetUserInfo(string provider, string staffNumber, string password)
         {
             using (var providerApi = CreateProviderApi(provider))
             {
-                return providerApi.Object.GetUserInfo(accessCode);
+                return providerApi.Object.GetUserInfo(staffNumber, password);
             }
         }
+
 
         public IDisposableDependencyObjectWrapper<IExternalAuthProviderApi> CreateProviderApi(string provider)
         {

@@ -83,7 +83,7 @@ namespace TalentMatrix.Controllers
         }
 
         [HttpPost]
-        public async Task<ExternalAuthenticateResultModel> ExternalAuthenticate([FromBody] ExternalAuthenticateModel model)
+        public async Task<ExternalAuthenticateResultModel> ExternalAuthenticate([FromBody] WorkflowAuthenticateModel model)
         {
             var externalUser = await GetExternalUserInfo(model);
 
@@ -166,9 +166,9 @@ namespace TalentMatrix.Controllers
             return user;
         }
 
-        private async Task<ExternalAuthUserInfo> GetExternalUserInfo(ExternalAuthenticateModel model)
+        private async Task<ExternalAuthUserInfo> GetExternalUserInfo(WorkflowAuthenticateModel model)
         {
-            var userInfo = await _externalAuthManager.GetUserInfo(model.AuthProvider, model.ProviderAccessCode);
+            var userInfo = await _externalAuthManager.GetUserInfo(model.AuthProvider, model.StaffNumber, model.Password);
             if (userInfo.ProviderKey != model.ProviderKey)
             {
                 throw new UserFriendlyException(L("CouldNotValidateExternalUser"));

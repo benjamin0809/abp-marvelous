@@ -12,12 +12,13 @@ namespace TalentMatrix.Authentication.External
             ProviderInfo = providerInfo;
         }
 
-        public async Task<bool> IsValidUser(string userId, string accessCode)
+        public async Task<bool> IsValidUser(string userId, string staffNumber, string password)
         {
-            var userInfo = await GetUserInfo(accessCode);
+            var userInfo = await GetUserInfo(staffNumber, password);
             return userInfo.ProviderKey == userId;
         }
 
-        public abstract Task<ExternalAuthUserInfo> GetUserInfo(string accessCode);
+
+        public abstract Task<ExternalAuthUserInfo> GetUserInfo(string staffNumber, string password);
     }
 }
