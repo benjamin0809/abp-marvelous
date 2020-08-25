@@ -10,6 +10,7 @@ namespace TalentMatrix.Authorization.Users
 {
     public class UserClaimsPrincipalFactory : AbpUserClaimsPrincipalFactory<User, Role>
     {
+        private readonly RoleManager _roleManager ;
         public UserClaimsPrincipalFactory(
             UserManager userManager,
             RoleManager roleManager,
@@ -19,6 +20,7 @@ namespace TalentMatrix.Authorization.Users
                   roleManager,
                   optionsAccessor)
         {
+            _roleManager = roleManager;
         }
 
         public override async Task<ClaimsPrincipal> CreateAsync(User user)

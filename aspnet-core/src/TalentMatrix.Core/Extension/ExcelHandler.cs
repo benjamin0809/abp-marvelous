@@ -22,7 +22,7 @@ namespace TalentMatrix.Extension
             string exportExcelPath = "E:\\export.xlsx";
             IWorkbook workbook = WorkbookFactory.Create(importExcelPath);
             ISheet sheet = workbook.GetSheetAt(0);//获取第一个工作薄
-
+            
             Debug.Write(sheet.PhysicalNumberOfRows);
             for (int i = 0; i < sheet.PhysicalNumberOfRows; i++)
             {
@@ -30,6 +30,7 @@ namespace TalentMatrix.Extension
 
                 //设置第一行第一列值,更多方法请参考源官方Demo
                 row.CreateCell(i).SetCellValue("test");//设置第一行第一列值
+                row.Hidden = true;
             }
 
 
@@ -53,11 +54,13 @@ namespace TalentMatrix.Extension
                 throw new Exception("sheet is null");
             }
             IRow codes_row = sheet.GetRow(0);
+                codes_row.Hidden = true;
             for (int i = 1; i < sheet.PhysicalNumberOfRows; i++)
             {
                 
                 Dictionary<string, object> AttributeDict = new Dictionary<string, object>();
                 IRow row = sheet.GetRow(i);
+                row.Hidden = true;
                 int cellCount = row.PhysicalNumberOfCells;
                 for (int j = 0; j < cellCount; j++)
                 {

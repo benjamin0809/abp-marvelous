@@ -30,6 +30,7 @@ namespace TalentMatrix.Users
         private readonly UserManager _userManager;
         private readonly RoleManager _roleManager;
         private readonly IRepository<Role> _roleRepository;
+        private readonly IUserRepository _userRepository;
         private readonly IPasswordHasher<User> _passwordHasher;
         private readonly IAbpSession _abpSession;
         private readonly LogInManager _logInManager;
@@ -41,7 +42,8 @@ namespace TalentMatrix.Users
             IRepository<Role> roleRepository,
             IPasswordHasher<User> passwordHasher,
             IAbpSession abpSession,
-            LogInManager logInManager)
+            LogInManager logInManager,
+            IUserRepository userRepository)
             : base(repository)
         {
             _userManager = userManager;
@@ -50,6 +52,13 @@ namespace TalentMatrix.Users
             _passwordHasher = passwordHasher;
             _abpSession = abpSession;
             _logInManager = logInManager;
+            _userRepository = userRepository;
+        }
+
+        public async Task<List<object>> GetUser()
+        {
+            var result = await _userRepository.GetUsers();
+            return result;
         }
 
         public override async Task<UserDto> CreateAsync(CreateUserDto input)
