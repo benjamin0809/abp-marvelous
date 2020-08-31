@@ -33,6 +33,18 @@ export const loginRouter: Router = {
     },
     component: () => import('../views/login.vue')
 };
+
+export const approvalTRouter: Router = {
+    path: '/approval',
+    name: 'approval',
+    permission: '',
+    meta: { title: 'Approval' },
+    component: () => import('../views/approval/layout.vue'),
+    children: [
+        { path: 'form', meta: { title: 'Form' },  component: () => import('../views/approval/form.vue') },
+        { path: 'hr-training', meta: { title: 'HR-training' },  component: () => import('../views/approval/hr-training.vue') }
+    ]
+}
 export const otherRouters: Router = {
     path: '/main',
     name: 'main',
@@ -40,7 +52,7 @@ export const otherRouters: Router = {
     meta: { title: 'ManageMenu' },
     component: main,
     children: [
-        { path: 'home', meta: { title: 'HomePage' }, name: 'home', component: () => import('../views/home/home.vue') }
+        { path: 'home', meta: { title: 'HomePage' }, name: 'home', component: () => import('../views/home/home.vue') },
     ]
 }
 export const appRouters: Array<Router> = [{
@@ -57,6 +69,7 @@ export const appRouters: Array<Router> = [{
     ]
 }]
 export const routers = [
+    approvalTRouter,
     loginRouter,
     locking,
     ...appRouters,
