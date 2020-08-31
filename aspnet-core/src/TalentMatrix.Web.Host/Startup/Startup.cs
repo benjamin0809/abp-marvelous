@@ -130,8 +130,8 @@ namespace TalentMatrix.Web.Host.Startup
             app.UseAuthentication();
 
             app.UseAbpRequestLocalization();
+            app.UseFileServer();
 
-          
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapHub<AbpCommonHub>("/signalr");

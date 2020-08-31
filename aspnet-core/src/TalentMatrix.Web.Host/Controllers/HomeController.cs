@@ -18,7 +18,12 @@ namespace TalentMatrix.Web.Host.Controllers
             _notificationPublisher = notificationPublisher;
         }
 
-        public IActionResult Index()
+        //public IActionResult Index()
+        //{
+        //    return Redirect("/index.html");
+        //}
+
+        public IActionResult Help()
         {
             return Redirect("/swagger");
         }
