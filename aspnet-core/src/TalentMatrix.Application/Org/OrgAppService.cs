@@ -2,8 +2,12 @@
 using Abp.Application.Services;
 using Abp.Collections.Extensions;
 using Abp.Domain.Repositories;
+using Abp.IO.Extensions;
 using Abp.Runtime.Session;
+using Abp.UI;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -24,17 +28,19 @@ namespace TalentMatrix.Org
         public string UserName { get; set; }
         public string InnerCode { get; set; }
     }
-    public class OrgAppService : IApplicationService, IOrgAppService
+    public class OrgAppService : ApplicationService, IApplicationService, IOrgAppService
     {
         private readonly IAbpSession _abpSession;
         public readonly IRepository<Organization> _reposity;
         public readonly IRepository<OrgUser> _orgReposity;
         public readonly IRepository<User, long> _userReposity;
         public readonly MyAppSession _myAppSession;
+        public readonly IHttpContextAccessor _accessor;
         public OrgAppService(IRepository<Organization> reposity,
             IRepository<OrgUser> orgReposity,
              IRepository<User, long> userReposity,
-        MyAppSession myAppSession,
+            MyAppSession myAppSession,
+            IHttpContextAccessor accessor,
              IAbpSession abpSession)
         {
             _orgReposity = orgReposity;
@@ -42,6 +48,7 @@ namespace TalentMatrix.Org
             _reposity = reposity;
             _myAppSession = myAppSession;
             _userReposity = userReposity;
+            _accessor = accessor;
         }
 
         public List<UserExtension> getAll()
@@ -81,6 +88,41 @@ namespace TalentMatrix.Org
             return query.WhereIf(!string.IsNullOrEmpty(fullname), s => s.FullName.Contains(fullname)).ToList();
         }
 
+
+        public async Task<List<Organization>> UploadFilePost()
+        {
+
+            var files = _accessor.HttpContext.Request.Form.Files;
+            //获取上传对象
+            var file = files.First();
+
+            //判断是否选择文件
+            if (file == null)
+            {
+                throw new UserFriendlyException(L("File_Empty_Error"));
+            }
+
+            //判断文件大小（单位：字节）
+            if (file.Length > 10485760) //10MB = 1024 * 1024 *10
+            {
+                throw new UserFriendlyException(L("File_SizeLimit_Error"));
+            }
+
+            //将文件流转为二进制数据
+            byte[] fileBytes;
+            using (var stream = file.OpenReadStream())
+            {
+                var result = ExcelHandler.ReadExcel<Organization>(stream);
+                foreach (var item in result)
+                {
+                    _reposity.Insert(item);
+                }
+                return await Task.FromResult(result);
+            }
+
+        }
+
+
         public List<UserExtension> getAllsByLambda(string fullname)
         {
 
@@ -107,7 +149,7 @@ namespace TalentMatrix.Org
                            UserName = user_orguser.UserName,
                            InnerCode = org.InnerCode
                        });
-        return query.ToList();
+            return query.ToList();
         }
         public List<Organization> GetOrgList()
         {

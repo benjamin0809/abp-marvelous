@@ -40,6 +40,38 @@ namespace TalentMatrix.Extension
             fs.Close();
         }
 
+        public static List<T> ReadExcel<T>(Stream inputStream) where T : new()
+        {
+            List<T> result = new List<T>();
+            Type t = typeof(T);
+            MemberInfo[] minfos = t.GetMembers();
+            // FileStream fs = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+            IWorkbook workbook = WorkbookFactory.Create(inputStream, true);
+            ISheet sheet = workbook.GetSheetAt(0);//获取第一个工作薄
+            if (sheet == null)
+            {
+                throw new Exception("sheet is null");
+            }
+            IRow codes_row = sheet.GetRow(0);
+            codes_row.Hidden = true;
+            for (int i = 1; i < sheet.PhysicalNumberOfRows; i++)
+            {
+
+                Dictionary<string, object> AttributeDict = new Dictionary<string, object>();
+                IRow row = sheet.GetRow(i);
+                row.Hidden = true;
+                int cellCount = row.PhysicalNumberOfCells;
+                for (int j = 0; j < cellCount; j++)
+                {
+                    AttributeDict.Add(codes_row.GetCell(j).StringCellValue, row.GetCell(j));
+                }
+
+                result.Add(DicToObject<T>(AttributeDict));
+            }
+            // fs.Close();
+            //ObjectMapper.Map<List<T>>(roles);
+            return result;
+        }
 
         public static List<T> ReadExcel<T>(string filePath) where T : new()
         {
@@ -82,11 +114,11 @@ namespace TalentMatrix.Extension
         public static T DicToObject<T>(Dictionary<string, object> dic) where T : new()
         {
             var md = new T();
-            CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
-            TextInfo textInfo = cultureInfo.TextInfo;
+            //CultureInfo cultureInfo = Thread.CurrentThread.CurrentCulture;
+            //TextInfo textInfo = cultureInfo.TextInfo;
             foreach (var d in dic)
             {
-                var filed = textInfo.ToTitleCase(d.Key);
+                var filed = d.Key;
                 try
                {
                     Type propertyType  = md.GetType().GetProperty(filed).PropertyType;
