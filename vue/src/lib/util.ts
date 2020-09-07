@@ -184,6 +184,7 @@ class Util{
                 ];
             }
         }
+        debugger
         vm.$store.commit('app/setCurrentPath', currentPathArr);
     
         return currentPathArr;
@@ -195,7 +196,7 @@ class Util{
         let tagHasOpened = false;
         while (i < openedPageLen) {
             if (name === pageOpenedList[i].name) { // 页面已经打开
-                vm.$store.commit('app/pageOpenedList', {
+                vm.$store.commit('app/pageOpenedList1', {
                     index: i,
                     argu: argu,
                     query: query

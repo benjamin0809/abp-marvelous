@@ -11,6 +11,8 @@ Vue.use(iView);
 import store from './store/index';
 Vue.config.productionTip = false;
 import { appRouters,otherRouters} from './router/router';
+import { moduleApp } from './store/modules/app';
+import { moduleSession } from './store/modules/session';
 if(!abp.utils.getCookieValue('Abp.Localization.CultureName')){
   let language=navigator.language;
   abp.utils.setCookieValue('Abp.Localization.CultureName',language,new Date(new Date().getTime() + 5 * 365 * 86400000),abp.appPath);
@@ -18,6 +20,7 @@ if(!abp.utils.getCookieValue('Abp.Localization.CultureName')){
 
 Ajax.get('/AbpUserConfiguration/GetAll').then(data=>{
   Util.abp=Util.extend(true,Util.abp,data.data.result);
+  debugger
   new Vue({
     render: h => h(App),
     router:router,
@@ -27,16 +30,14 @@ Ajax.get('/AbpUserConfiguration/GetAll').then(data=>{
     },
     async mounted () {
       this.currentPageName = this.$route.name as string;
-      await this.$store.dispatch({
-        type:'session/init'
-      })
+      moduleSession.init()
       if(!!this.$store.state.session.user&&this.$store.state.session.application.features['SignalR']){
         if (this.$store.state.session.application.features['SignalR.AspNetCore']) {
             SignalRAspNetCoreHelper.initSignalR();
         }
       }
-      this.$store.commit('app/initCachepage');
-      this.$store.commit('app/updateMenulist');
+      moduleApp.initCachepage()
+      moduleApp.updateMenulist()
     },
     created () {
       let tagsList:Array<any> = [];
@@ -47,7 +48,7 @@ Ajax.get('/AbpUserConfiguration/GetAll').then(data=>{
               tagsList.push(...item.children);
           }
       });
-      this.$store.commit('app/setTagsList', tagsList);
+      moduleApp.setTagsList(tagsList)
     }
   }).$mount('#app')
 })

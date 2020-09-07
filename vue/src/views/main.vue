@@ -80,6 +80,7 @@
     import copyfooter from '../components/Footer.vue'
     import LanguageList from '../components/language-list.vue'
     import AbpBase from '../lib/abpbase'
+    // import { moduleApp } from '@/store/modules/app';
     @Component({
       components:{shrinkableMenu,tagsPageOpened,breadcrumbNav,fullScreen,lockScreen,notice,copyfooter,LanguageList}
     })
@@ -119,7 +120,7 @@
         }
         init () {
           let pathArr = util.setCurrentPath(this, this.$route.name as string);
-          this.$store.commit('app/updateMenulist');
+          // moduleApp.setCurrentPageName(this.$route.name)
           if (pathArr.length >= 2) {
             this.$store.commit('app/addOpenSubmenu', pathArr[1].name);
           }
