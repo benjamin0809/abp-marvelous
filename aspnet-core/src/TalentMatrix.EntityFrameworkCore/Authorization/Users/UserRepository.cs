@@ -46,21 +46,19 @@ namespace TalentMatrix.Authorization.Users
             }
         }
 
-        public async Task<List<object>> GetUsers()
+        public async Task<List<User>> GetUsers()
         {
-            
-            using (var command = CreateCommand("SELECT * FROM [TalentMatrixDB].[dbo].[AbpUsers]", CommandType.Text))
+            string sql = @"Delete from [TalentMatrixDB].[dbo].[Organization] where id = @Id;SELECT * FROM [TalentMatrixDB].[dbo].[AbpUsers];";
+            SqlParameter[] parameters = { new SqlParameter("@Id", 55) };
+
+            using (var command = CreateCommand(sql, CommandType.Text, parameters))
             {
                 using (var dataReader = await command.ExecuteReaderAsync())
                 {
                     var result = new List<object>();
                     var res = ToList<User>(dataReader);
-                    while (dataReader.Read())
-                    {
-                        result.Add(dataReader["UserName"].ToString());
-                        // result.Add(dataReader);
-                    }
-                    return result;
+                    User user = res.FirstOrDefault();
+                    return res;
                 }
             }
         }

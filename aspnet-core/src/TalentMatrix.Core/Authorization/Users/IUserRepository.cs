@@ -9,6 +9,6 @@ namespace TalentMatrix.Authorization.Users
     public interface IUserRepository: IRepository<User, long>
     {
         Task<List<string>> GetUserNames();
-        public Task<List<object>> GetUsers();
+        public Task<List<User>> GetUsers();
     }
 }

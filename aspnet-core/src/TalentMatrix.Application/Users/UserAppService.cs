@@ -55,7 +55,7 @@ namespace TalentMatrix.Users
             _userRepository = userRepository;
         }
 
-        public async Task<List<object>> GetUser()
+        public async Task<List<User>> GetUser()
         {
             var result = await _userRepository.GetUsers();
             return result;

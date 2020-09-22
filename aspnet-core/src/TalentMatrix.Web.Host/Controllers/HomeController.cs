@@ -6,6 +6,7 @@ using Abp.Notifications;
 using Abp.Timing;
 using Abp.Web.Security.AntiForgery;
 using TalentMatrix.Controllers;
+using System.Linq;
 
 namespace TalentMatrix.Web.Host.Controllers
 {
@@ -24,9 +25,10 @@ namespace TalentMatrix.Web.Host.Controllers
         //}
 
         public IActionResult Help()
-        {
+        { 
             return Redirect("/swagger");
         }
+
 
         /// <summary>
         /// This is a demo code to demonstrate sending notification to default tenant admin and host admin uers.

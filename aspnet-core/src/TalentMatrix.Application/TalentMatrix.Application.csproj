@@ -11,7 +11,9 @@
     <RootNamespace>TalentMatrix</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Mime-Detective" Version="0.0.5" />
     <PackageReference Include="NPOI" Version="2.5.1" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="1.0.1" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\TalentMatrix.Core\TalentMatrix.Core.csproj" />
